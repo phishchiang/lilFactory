@@ -35,6 +35,15 @@
     let time = 0;
     let carGroup = new THREE.Group();
     let envGroup = new THREE.Group();
+
+    carAudio = new Audio('./resource/sound/horn.mp3'); 
+    engineAudio = new Audio('./resource/sound/Engine.mp3'); 
+    engineAudio.addEventListener('ended', function(){
+      this.currentTime = 0;
+      this.play();
+    }, false);
+    engineAudio.play();
+
     init();
     animate();
 
@@ -86,7 +95,7 @@
       // Car
       
       scene.add( carGroup );
-      loader.load( './models/fbx/car.fbx', function ( fbx ) {
+      loader.load( './resource/models/fbx/car.fbx', function ( fbx ) {
         fbx.mixer = new THREE.AnimationMixer( fbx );
         let mesh = fbx.children[0];
         mesh.material = new THREE.MeshPhongMaterial({vertexColors: THREE.VertexColors});
@@ -106,7 +115,7 @@
       // Env
       
       scene.add( envGroup );
-      loader.load( './models/fbx/env.fbx', function ( fbx ) {
+      loader.load( './resource/models/fbx/env.fbx', function ( fbx ) {
         fbx.mixer = new THREE.AnimationMixer( fbx );
         let mesh = fbx.children[0];
         mesh.material = new THREE.MeshPhongMaterial({vertexColors: THREE.VertexColors});
@@ -146,6 +155,7 @@
     }
     function mousedown(e){
         if ( !isTweening ) {
+          carAudio.play();
           isTweening = true;
           renderer.domElement.style.cursor = 'default';
           carMoves();
