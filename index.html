@@ -5,6 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Three JS Playground</title>
+  <style>
+    html { overflow: hidden; }
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+      font-size: 13px;
+      line-height: 20px;
+      color: #333;
+      background: #feab4f;
+    }
+  </style>
 </head>
 <body>
   <script src="./js/three.js"></script>
@@ -30,11 +43,6 @@
       renderer.setSize( window.innerWidth, window.innerHeight );
       document.body.appendChild( renderer.domElement );
       /*
-      // WEBVR.createButton
-      renderer.vr.enabled = true;
-      document.body.appendChild( WEBVR.createButton( renderer ) );
-      */
-      
       var geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
       var loader = new THREE.TextureLoader();
       // var textureMapCube = loader.load( 'models/fbx/img/maps.jpg' );
@@ -44,19 +52,19 @@
       threeJsCube.position.x = -3.25;
       threeJsCube.scale.set(0.5, 0.5, 0.5);
       
-      
-      
       var floorGeo = new THREE.PlaneBufferGeometry( 10,10 );
       var floorMesh = new THREE.Mesh( floorGeo, material );
       floorMesh.rotation.x = -Math.PI / 2;
       floorMesh.position.y = 0;
       scene.add( floorMesh );
+      */
       // Lighting
+      /*
       var spolotLight = new THREE.SpotLight( 0xFFFFFF, 0.95 ); // soft white light
-      spolotLight.position.set(1,2,0);
+      spolotLight.position.set(1,5,0);
       scene.add( spolotLight );
-
-      var amibLight = new THREE.AmbientLight( 0xFFFFFF, 0.75 );
+      */
+      var amibLight = new THREE.AmbientLight( 0xFFFFFF, 1 );
       amibLight.position.set( 3,3,3 );
       scene.add( amibLight );
 
@@ -70,38 +78,48 @@
       
       //FBX import
       var loader = new THREE.FBXLoader();
-      
-      var fbxMt = new THREE.MeshBasicMaterial( {color: 0xffffff} );
-      var cubeGeo = [];
-      var cubeJnt = [];
-      
-      loader.load( './models/fbx/car.fbx', function ( object ) {
-        object.mixer = new THREE.AnimationMixer( object );
-        var mesh = object.children[0];
-        mesh.material = new THREE.MeshPhongMaterial({
-          vertexColors: THREE.VertexColors
-        });
-        /*
-        mixers.push( object.mixer );
-        var action = object.mixer.clipAction( object.animations[ 0 ] );
-        action.play();
-        */
-        object.traverse( function ( child ) {
+      // Car
+      loader.load( './models/fbx/car.fbx', function ( fbx ) {
+        fbx.mixer = new THREE.AnimationMixer( fbx );
+        var mesh = fbx.children[0];
+        mesh.material = new THREE.MeshPhongMaterial({vertexColors: THREE.VertexColors});
+
+        fbx.traverse( function ( child ) {
           if ( child.isMesh ) {
             child.castShadow = true;
             child.receiveShadow = true;
           }
         });
-        console.log(object);
-        /*
-        cubeGeo = object.children[0];
-        cubeJnt = object.children[1];
-        cubeJnt.add( threeJsCube );
-        */
-        scene.add( object );
-      } );
+        console.log(fbx);
+        scene.add( fbx );
+      });
+      // Env
+      loader.load( './models/fbx/env.fbx', function ( fbx ) {
+        fbx.mixer = new THREE.AnimationMixer( fbx );
+        var mesh = fbx.children[0];
+        mesh.material = new THREE.MeshPhongMaterial({vertexColors: THREE.VertexColors});
+
+        fbx.traverse( function ( child ) {
+          if ( child.isMesh ) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+          }
+        });
+        console.log(fbx);
+        scene.add( fbx );
+        fbx.rotation.set(0,0,0);
+        fbx.position.set(1,0,-6);
+      });
+
+      window.addEventListener( 'resize', onWindowResize, false );
     }
-    
+    function onWindowResize() {
+      windowHalfX = window.innerWidth / 2;
+      windowHalfY = window.innerHeight / 2;
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize( window.innerWidth, window.innerHeight );
+    }
     function animate() {
       requestAnimationFrame(animate);
       // renderer.setAnimationLoop( render );
