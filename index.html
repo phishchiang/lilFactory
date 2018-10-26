@@ -20,9 +20,9 @@
   </style>
 </head>
 <body>
-  <script src="./js/three.js"></script>
-  <script src="./js/OrbitControls.js"></script>
-  <script src="./js/FBXLoader.js"></script>
+  <script src="https://cdn.rawgit.com/mrdoob/three.js/r89/build/three.js"></script>
+  <script src="https://cdn.rawgit.com/mrdoob/three.js/r89/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdn.rawgit.com/mrdoob/three.js/r89/examples/js/loaders/FBXLoader.js"></script>
   <!-- <script src="js/WebVR.js"></script> -->
   <script>
     
@@ -79,6 +79,8 @@
       //FBX import
       var loader = new THREE.FBXLoader();
       // Car
+      var carGroup = new THREE.Group();
+      scene.add( carGroup );
       loader.load( './models/fbx/car.fbx', function ( fbx ) {
         fbx.mixer = new THREE.AnimationMixer( fbx );
         var mesh = fbx.children[0];
@@ -91,9 +93,14 @@
           }
         });
         console.log(fbx);
-        scene.add( fbx );
+        carGroup.add( fbx );
       });
+
+      carGroup.rotation.set(0,-Math.PI/2,0);
+      carGroup.position.set(1,0,10);
       // Env
+      var envGroup = new THREE.Group();
+      scene.add( envGroup );
       loader.load( './models/fbx/env.fbx', function ( fbx ) {
         fbx.mixer = new THREE.AnimationMixer( fbx );
         var mesh = fbx.children[0];
@@ -106,10 +113,9 @@
           }
         });
         console.log(fbx);
-        scene.add( fbx );
-        fbx.rotation.set(0,0,0);
-        fbx.position.set(1,0,-6);
+        envGroup.add( fbx );
       });
+
 
       window.addEventListener( 'resize', onWindowResize, false );
     }
@@ -122,14 +128,7 @@
     }
     function animate() {
       requestAnimationFrame(animate);
-      // renderer.setAnimationLoop( render );
-      /*
-      if ( mixers.length > 0 ) {
-        for ( var i = 0; i < mixers.length; i ++ ) {
-          mixers[ i ].update( clock.getDelta() );
-        }
-      }
-      */
+
       renderer.render( scene, camera );
     }
 
