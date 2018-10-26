@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Three JS Playground</title>
+</head>
+<body>
+  <script src="./js/three.js"></script>
+  <script src="./js/OrbitControls.js"></script>
+  <script src="./js/FBXLoader.js"></script>
+  <!-- <script src="js/WebVR.js"></script> -->
+  <script>
+    
+    var camera, scene, renderer;
+    let snowPartiArray;
+    var mixers = [];
+    var clock = new THREE.Clock();
+    init();
+    animate();
+
+
+    function init(){
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0xbad4ff);
+      camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 10000);
+
+      renderer = new THREE.WebGLRenderer();
+      renderer.setSize( window.innerWidth, window.innerHeight );
+      document.body.appendChild( renderer.domElement );
+      /*
+      // WEBVR.createButton
+      renderer.vr.enabled = true;
+      document.body.appendChild( WEBVR.createButton( renderer ) );
+      */
+      
+      var geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
+      var loader = new THREE.TextureLoader();
+      // var textureMapCube = loader.load( 'models/fbx/img/maps.jpg' );
+      // var material = new THREE.MeshPhongMaterial( {color: 0x00ff00, map: textureMapCube} );
+      var material = new THREE.MeshPhongMaterial( {color: 0xeeeeee} );
+      var threeJsCube = new THREE.Mesh( geometry, material );
+      threeJsCube.position.x = -3.25;
+      threeJsCube.scale.set(0.5, 0.5, 0.5);
+      
+      
+      
+      var floorGeo = new THREE.PlaneBufferGeometry( 10,10 );
+      var floorMesh = new THREE.Mesh( floorGeo, material );
+      floorMesh.rotation.x = -Math.PI / 2;
+      floorMesh.position.y = 0;
+      scene.add( floorMesh );
+      // Lighting
+      var spolotLight = new THREE.SpotLight( 0xFFFFFF, 0.95 ); // soft white light
+      spolotLight.position.set(1,2,0);
+      scene.add( spolotLight );
+
+      var amibLight = new THREE.AmbientLight( 0xFFFFFF, 0.75 );
+      amibLight.position.set( 3,3,3 );
+      scene.add( amibLight );
+
+      // Controller
+      camera.position.z=3;
+      var controls = new THREE.OrbitControls(camera, renderer.domElement)
+      camera.position.z = 15
+      camera.position.y = 1
+      controls.update()
+      
+      
+      //FBX import
+      var loader = new THREE.FBXLoader();
+      
+      var fbxMt = new THREE.MeshBasicMaterial( {color: 0xffffff} );
+      var cubeGeo = [];
+      var cubeJnt = [];
+      
+      loader.load( './models/fbx/car.fbx', function ( object ) {
+        object.mixer = new THREE.AnimationMixer( object );
+        var mesh = object.children[0];
+        mesh.material = new THREE.MeshPhongMaterial({
+          vertexColors: THREE.VertexColors
+        });
+        /*
+        mixers.push( object.mixer );
+        var action = object.mixer.clipAction( object.animations[ 0 ] );
+        action.play();
+        */
+        object.traverse( function ( child ) {
+          if ( child.isMesh ) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+          }
+        });
+        console.log(object);
+        /*
+        cubeGeo = object.children[0];
+        cubeJnt = object.children[1];
+        cubeJnt.add( threeJsCube );
+        */
+        scene.add( object );
+      } );
+    }
+    
+    function animate() {
+      requestAnimationFrame(animate);
+      // renderer.setAnimationLoop( render );
+      /*
+      if ( mixers.length > 0 ) {
+        for ( var i = 0; i < mixers.length; i ++ ) {
+          mixers[ i ].update( clock.getDelta() );
+        }
+      }
+      */
+      renderer.render( scene, camera );
+    }
+
+  </script>
+</body>
+</html>
