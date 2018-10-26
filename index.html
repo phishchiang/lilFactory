@@ -28,9 +28,13 @@
   <script>
     
     let camera, scene, renderer;
+    let isTweening = false;
     let snowPartiArray;
     let mixers = [];
     let clock = new THREE.Clock();
+    let time = 0;
+    let carGroup = new THREE.Group();
+    let envGroup = new THREE.Group();
     init();
     animate();
 
@@ -80,7 +84,7 @@
       //FBX import
       let loader = new THREE.FBXLoader();
       // Car
-      let carGroup = new THREE.Group();
+      
       scene.add( carGroup );
       loader.load( './models/fbx/car.fbx', function ( fbx ) {
         fbx.mixer = new THREE.AnimationMixer( fbx );
@@ -100,7 +104,7 @@
       carGroup.rotation.set(0,-Math.PI/2,0);
       carGroup.position.set(1,0,10);
       // Env
-      let envGroup = new THREE.Group();
+      
       scene.add( envGroup );
       loader.load( './models/fbx/env.fbx', function ( fbx ) {
         fbx.mixer = new THREE.AnimationMixer( fbx );
@@ -117,9 +121,37 @@
         envGroup.add( fbx );
       });
 
-
+      
+      renderer.domElement.addEventListener('mousedown', mousedown);
       window.addEventListener( 'resize', onWindowResize, false );
     }
+    function carMoves(){
+      console.log(isTweening);
+      let swing = new TWEEN.Tween( carGroup.position )
+        .to( { y: 2 }, 300 )
+        // .easing( TWEEN.Easing.Back.In )
+        .onComplete(function(){
+          carGroup.position.y = 2;
+          let reset = new TWEEN.Tween( carGroup.position )
+            .to( { y: 0 }, 300 )
+            .delay( 100 )
+            // .easing( TWEEN.Easing.Exponential.InOut )
+            .onComplete(function(){
+              isTweening = false;
+              renderer.domElement.style.cursor = 'pointer';
+            })
+            .start();
+          })
+          .start();
+    }
+    function mousedown(e){
+        if ( !isTweening ) {
+          isTweening = true;
+          renderer.domElement.style.cursor = 'default';
+          carMoves();
+        }
+      }
+
     function onWindowResize() {
       windowHalfX = window.innerWidth / 2;
       windowHalfY = window.innerHeight / 2;
@@ -129,7 +161,11 @@
     }
     function animate() {
       requestAnimationFrame(animate);
-
+      time += clock.getDelta();
+      TWEEN.update();
+      if(!isTweening){
+        carGroup.position.y = Math.cos( time * 22 ) * 0.05;
+      }
       renderer.render( scene, camera );
     }
 
