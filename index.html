@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Three JS Playground</title>
+  <title>Little Happy Factory</title>
   <style>
     html { overflow: hidden; }
     body {
@@ -23,13 +23,14 @@
   <script src="https://cdn.rawgit.com/mrdoob/three.js/r89/build/three.js"></script>
   <script src="https://cdn.rawgit.com/mrdoob/three.js/r89/examples/js/controls/OrbitControls.js"></script>
   <script src="https://cdn.rawgit.com/mrdoob/three.js/r89/examples/js/loaders/FBXLoader.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/17.1.1/Tween.min.js"></script>
   <!-- <script src="js/WebVR.js"></script> -->
   <script>
     
-    var camera, scene, renderer;
+    let camera, scene, renderer;
     let snowPartiArray;
-    var mixers = [];
-    var clock = new THREE.Clock();
+    let mixers = [];
+    let clock = new THREE.Clock();
     init();
     animate();
 
@@ -43,47 +44,47 @@
       renderer.setSize( window.innerWidth, window.innerHeight );
       document.body.appendChild( renderer.domElement );
       /*
-      var geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
-      var loader = new THREE.TextureLoader();
-      // var textureMapCube = loader.load( 'models/fbx/img/maps.jpg' );
-      // var material = new THREE.MeshPhongMaterial( {color: 0x00ff00, map: textureMapCube} );
-      var material = new THREE.MeshPhongMaterial( {color: 0xeeeeee} );
-      var threeJsCube = new THREE.Mesh( geometry, material );
+      let geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
+      let loader = new THREE.TextureLoader();
+      // let textureMapCube = loader.load( 'models/fbx/img/maps.jpg' );
+      // let material = new THREE.MeshPhongMaterial( {color: 0x00ff00, map: textureMapCube} );
+      let material = new THREE.MeshPhongMaterial( {color: 0xeeeeee} );
+      let threeJsCube = new THREE.Mesh( geometry, material );
       threeJsCube.position.x = -3.25;
       threeJsCube.scale.set(0.5, 0.5, 0.5);
       
-      var floorGeo = new THREE.PlaneBufferGeometry( 10,10 );
-      var floorMesh = new THREE.Mesh( floorGeo, material );
+      let floorGeo = new THREE.PlaneBufferGeometry( 10,10 );
+      let floorMesh = new THREE.Mesh( floorGeo, material );
       floorMesh.rotation.x = -Math.PI / 2;
       floorMesh.position.y = 0;
       scene.add( floorMesh );
       */
       // Lighting
       /*
-      var spolotLight = new THREE.SpotLight( 0xFFFFFF, 0.95 ); // soft white light
+      let spolotLight = new THREE.SpotLight( 0xFFFFFF, 0.95 ); // soft white light
       spolotLight.position.set(1,5,0);
       scene.add( spolotLight );
       */
-      var amibLight = new THREE.AmbientLight( 0xFFFFFF, 1 );
+      let amibLight = new THREE.AmbientLight( 0xFFFFFF, 1 );
       amibLight.position.set( 3,3,3 );
       scene.add( amibLight );
 
       // Controller
       camera.position.z=3;
-      var controls = new THREE.OrbitControls(camera, renderer.domElement)
+      let controls = new THREE.OrbitControls(camera, renderer.domElement)
       camera.position.z = 15
       camera.position.y = 1
       controls.update()
       
       
       //FBX import
-      var loader = new THREE.FBXLoader();
+      let loader = new THREE.FBXLoader();
       // Car
-      var carGroup = new THREE.Group();
+      let carGroup = new THREE.Group();
       scene.add( carGroup );
       loader.load( './models/fbx/car.fbx', function ( fbx ) {
         fbx.mixer = new THREE.AnimationMixer( fbx );
-        var mesh = fbx.children[0];
+        let mesh = fbx.children[0];
         mesh.material = new THREE.MeshPhongMaterial({vertexColors: THREE.VertexColors});
 
         fbx.traverse( function ( child ) {
@@ -99,11 +100,11 @@
       carGroup.rotation.set(0,-Math.PI/2,0);
       carGroup.position.set(1,0,10);
       // Env
-      var envGroup = new THREE.Group();
+      let envGroup = new THREE.Group();
       scene.add( envGroup );
       loader.load( './models/fbx/env.fbx', function ( fbx ) {
         fbx.mixer = new THREE.AnimationMixer( fbx );
-        var mesh = fbx.children[0];
+        let mesh = fbx.children[0];
         mesh.material = new THREE.MeshPhongMaterial({vertexColors: THREE.VertexColors});
 
         fbx.traverse( function ( child ) {
