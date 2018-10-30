@@ -35,6 +35,9 @@
     let time = 0;
     let carGroup = new THREE.Group();
     let envGroup = new THREE.Group();
+    let infoCardFactoryGrp = new THREE.Group();
+    let infoCardCarGrp = new THREE.Group();
+
 
     let mouse, raycaster;
     raycaster = new THREE.Raycaster();
@@ -139,8 +142,9 @@
         envGroup.add( fbx );
       });
       
-      let fonLloader = new THREE.FontLoader();
-      fonLloader.load( './resource/fonts/Varela_Round_Regular.json', function ( font ) {
+      // Factory card info
+      let fontLloader = new THREE.FontLoader();
+      fontLloader.load( './resource/fonts/Varela_Round_Regular.json', function ( font ) {
         let xMid, text;
         let color = 0x006699;
 
@@ -149,24 +153,101 @@
           transparent: true,
           opacity: 0.4,
           side: THREE.DoubleSide
-        } );
-        let message = "Little Factory\nLocation : Singapore ";
-        let shapes = font.generateShapes( message, 1 );
+        });
+        let message = "Little Factory\nLocation : Singapore\nPhone : 111 1234-5678 ";
+        let shapes = font.generateShapes( message, 0.75 );
         let geometry = new THREE.ShapeBufferGeometry( shapes );
         geometry.computeBoundingBox();
         xMid = - 0.5 * ( geometry.boundingBox.max.x - geometry.boundingBox.min.x );
         geometry.translate( xMid, 0, 0 );
-        // make shape ( N.B. edge view not visible )
         text = new THREE.Mesh( geometry, matLite );
-        scene.add( text );
-
-        text.position.y = 10;
+        infoCardFactoryGrp.add( text );
+        text.position.z = 0.05;
       });
+      
+      let material = new THREE.MeshBasicMaterial({
+        color: 0xeeeeee,
+        transparent: true,
+        opacity: 0.4,
+        side: THREE.DoubleSide,
+        });
+      let cardFacGeo = new THREE.PlaneBufferGeometry( 13, 6 );
+      let cardFacMesh = new THREE.Mesh( cardFacGeo, material );
+      cardFacMesh.position.y = -1;
+      infoCardFactoryGrp.add( cardFacMesh );
+
+      scene.add( infoCardFactoryGrp );
+      infoCardFactoryGrp.scale.set(0.01, 0.01, 0.01);
+      infoCardFactoryGrp.position.set(0, 0, 0);
+
+
+      
+
+
+      // Car card info
+      fontLloader.load( './resource/fonts/Varela_Round_Regular.json', function ( font ) {
+        let xMid, text;
+        let color = 0x006699;
+
+        let matLite = new THREE.MeshBasicMaterial( {
+          color: color,
+          transparent: true,
+          opacity: 0.4,
+          side: THREE.DoubleSide
+        });
+        let message = "Little Car\nBrand : Tesla Semi\nType : Truck ";
+        let shapes = font.generateShapes( message, 0.75 );
+        let geometry = new THREE.ShapeBufferGeometry( shapes );
+        geometry.computeBoundingBox();
+        xMid = - 0.5 * ( geometry.boundingBox.max.x - geometry.boundingBox.min.x );
+        geometry.translate( xMid, 0, 0 );
+        text = new THREE.Mesh( geometry, matLite );
+        infoCardCarGrp.add( text );
+        text.position.z = 0.05;
+      });
+
+      let cardCarGeo = new THREE.PlaneBufferGeometry( 11, 6 );
+      let cardCarMesh = new THREE.Mesh( cardCarGeo, material );
+      cardCarMesh.position.y = -1;
+      
+      scene.add( infoCardCarGrp );
+      infoCardCarGrp.add( cardCarMesh );
+      infoCardCarGrp.rotation.y = Math.PI / 2;
+      infoCardCarGrp.scale.set(0.75, 0.75, 0.75);
+      infoCardCarGrp.position.set(0, 8, 10);
+
       //add event listener for mouse and calls function when activated
       document.addEventListener( 'mousedown', onDocumentMouseDown, false );
       // renderer.domElement.addEventListener('mousedown', mousedown);
       window.addEventListener( 'resize', onWindowResize, false );
     }
+    
+    function showFacinfoCard (e){
+      // console.log(e);
+      let scaleUp = new TWEEN.Tween( infoCardFactoryGrp.scale )
+        .to( { x: 1, y: 1, z: 1 }, 800 )
+        .easing( TWEEN.Easing.Exponential.InOut )
+        .start();
+
+      let swing = new TWEEN.Tween( infoCardFactoryGrp.position )
+        .to( { y: 13 }, 800 )
+        .easing( TWEEN.Easing.Exponential.InOut )
+        .start();
+    }
+
+    function showCarinfoCard (e){
+      // console.log(e);
+      let scaleUp = new TWEEN.Tween( infoCardCarGrp.scale )
+        .to( { x: 1, y: 1, z: 1 }, 800 )
+        .easing( TWEEN.Easing.Exponential.InOut )
+        .start();
+
+      let swing = new TWEEN.Tween( infoCardCarGrp.position )
+        .to( { y: 13 }, 800 )
+        .easing( TWEEN.Easing.Exponential.InOut )
+        .start();
+    }
+
     function carMoves(){
       console.log(isTweening);
       let swing = new TWEEN.Tween( carGroup.position )
@@ -195,9 +276,19 @@
       let intersects = raycaster.intersectObjects( intersectObjs );
       // console.log(intersects);
       if ( intersects.length > 0 ){
-        console.log(intersects[0].object);
-        intersects[ 0 ].object.material.color.setHex(Math.random() * 0xffffff);
+        // console.log(intersects[0].object.name);
+        // intersects[ 0 ].object.material.color.setHex(Math.random() * 0xffffff);
+        
+        if(intersects[0].object.name==='factory_evn_a01'){
+          console.log('do fac');
+          showFacinfoCard();
+
+        }
+        if(intersects[0].object.name==='factory_car_a01'){
+          console.log('do car');
+        }
       }
+      
     }
 
     function mousedown(e){
