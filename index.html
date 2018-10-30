@@ -39,7 +39,7 @@
     let mouse, raycaster;
     raycaster = new THREE.Raycaster();
     mouse = new THREE.Vector2();
-    let allObjs = [];
+    let intersectObjs = [];
 
     carAudio = new Audio('./resource/sound/horn.mp3'); 
     /*
@@ -111,7 +111,7 @@
           if ( child.isMesh ) {
             child.castShadow = true;
             child.receiveShadow = true;
-            allObjs.push(child);
+            intersectObjs.push(child);
           }
         });
         console.log(fbx);
@@ -132,18 +132,36 @@
           if ( child.isMesh ) {
             child.castShadow = true;
             child.receiveShadow = true;
-            allObjs.push(child);
+            intersectObjs.push(child);
           }
         });
         console.log(fbx);
         envGroup.add( fbx );
       });
       
-      // scene.traverse(function(children){
-      //   allObjs.push(children);
-      // });
+      let fonLloader = new THREE.FontLoader();
+      fonLloader.load( './resource/fonts/Varela_Round_Regular.json', function ( font ) {
+        let xMid, text;
+        let color = 0x006699;
 
+        let matLite = new THREE.MeshBasicMaterial( {
+          color: color,
+          transparent: true,
+          opacity: 0.4,
+          side: THREE.DoubleSide
+        } );
+        let message = "Little Factory\nLocation : Singapore ";
+        let shapes = font.generateShapes( message, 1 );
+        let geometry = new THREE.ShapeBufferGeometry( shapes );
+        geometry.computeBoundingBox();
+        xMid = - 0.5 * ( geometry.boundingBox.max.x - geometry.boundingBox.min.x );
+        geometry.translate( xMid, 0, 0 );
+        // make shape ( N.B. edge view not visible )
+        text = new THREE.Mesh( geometry, matLite );
+        scene.add( text );
 
+        text.position.y = 10;
+      });
       //add event listener for mouse and calls function when activated
       document.addEventListener( 'mousedown', onDocumentMouseDown, false );
       // renderer.domElement.addEventListener('mousedown', mousedown);
@@ -174,7 +192,7 @@
       mouse.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
       mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
       raycaster.setFromCamera( mouse, camera );
-      let intersects = raycaster.intersectObjects( allObjs );
+      let intersects = raycaster.intersectObjects( intersectObjs );
       // console.log(intersects);
       if ( intersects.length > 0 ){
         console.log(intersects[0].object);
