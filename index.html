@@ -36,13 +36,20 @@
     let carGroup = new THREE.Group();
     let envGroup = new THREE.Group();
 
+    let mouse, raycaster;
+    raycaster = new THREE.Raycaster();
+    mouse = new THREE.Vector2();
+    let allObjs = [];
+
     carAudio = new Audio('./resource/sound/horn.mp3'); 
+    /*
     engineAudio = new Audio('./resource/sound/Engine.mp3'); 
     engineAudio.addEventListener('ended', function(){
       this.currentTime = 0;
       this.play();
     }, false);
     engineAudio.play();
+    */
 
     init();
     animate();
@@ -104,6 +111,7 @@
           if ( child.isMesh ) {
             child.castShadow = true;
             child.receiveShadow = true;
+            allObjs.push(child);
           }
         });
         console.log(fbx);
@@ -124,14 +132,21 @@
           if ( child.isMesh ) {
             child.castShadow = true;
             child.receiveShadow = true;
+            allObjs.push(child);
           }
         });
         console.log(fbx);
         envGroup.add( fbx );
       });
-
       
-      renderer.domElement.addEventListener('mousedown', mousedown);
+      // scene.traverse(function(children){
+      //   allObjs.push(children);
+      // });
+
+
+      //add event listener for mouse and calls function when activated
+      document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+      // renderer.domElement.addEventListener('mousedown', mousedown);
       window.addEventListener( 'resize', onWindowResize, false );
     }
     function carMoves(){
@@ -153,6 +168,20 @@
           })
           .start();
     }
+
+    function onDocumentMouseDown(e){
+      event.preventDefault();
+      mouse.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
+      mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
+      raycaster.setFromCamera( mouse, camera );
+      let intersects = raycaster.intersectObjects( allObjs );
+      // console.log(intersects);
+      if ( intersects.length > 0 ){
+        console.log(intersects[0].object);
+        intersects[ 0 ].object.material.color.setHex(Math.random() * 0xffffff);
+      }
+    }
+
     function mousedown(e){
         if ( !isTweening ) {
           carAudio.play();
