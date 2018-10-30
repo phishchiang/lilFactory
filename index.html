@@ -177,7 +177,7 @@
       infoCardFactoryGrp.add( cardFacMesh );
 
       scene.add( infoCardFactoryGrp );
-      infoCardFactoryGrp.scale.set(0.01, 0.01, 0.01);
+      infoCardFactoryGrp.scale.set(1, 0.01, 1);
       infoCardFactoryGrp.position.set(0, 0, 0);
 
 
@@ -213,15 +213,15 @@
       scene.add( infoCardCarGrp );
       infoCardCarGrp.add( cardCarMesh );
       infoCardCarGrp.rotation.y = Math.PI / 2;
-      infoCardCarGrp.scale.set(0.75, 0.75, 0.75);
-      infoCardCarGrp.position.set(0, 8, 10);
+      infoCardCarGrp.scale.set(0.75, 0.001, 0.75);
+      infoCardCarGrp.position.set(0, 0, 10);
 
       //add event listener for mouse and calls function when activated
       document.addEventListener( 'mousedown', onDocumentMouseDown, false );
       // renderer.domElement.addEventListener('mousedown', mousedown);
       window.addEventListener( 'resize', onWindowResize, false );
     }
-    
+    // Factory show up animation
     function showFacinfoCard (e){
       // console.log(e);
       let scaleUp = new TWEEN.Tween( infoCardFactoryGrp.scale )
@@ -234,16 +234,16 @@
         .easing( TWEEN.Easing.Exponential.InOut )
         .start();
     }
-
+    // Car show up animation
     function showCarinfoCard (e){
       // console.log(e);
       let scaleUp = new TWEEN.Tween( infoCardCarGrp.scale )
-        .to( { x: 1, y: 1, z: 1 }, 800 )
+        .to( { x: 0.75, y: 0.75, z: 0.75 }, 800 )
         .easing( TWEEN.Easing.Exponential.InOut )
         .start();
 
       let swing = new TWEEN.Tween( infoCardCarGrp.position )
-        .to( { y: 13 }, 800 )
+        .to( { y: 8 }, 800 )
         .easing( TWEEN.Easing.Exponential.InOut )
         .start();
     }
@@ -286,6 +286,7 @@
         }
         if(intersects[0].object.name==='factory_car_a01'){
           console.log('do car');
+          showCarinfoCard();
         }
       }
       
