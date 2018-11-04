@@ -25,6 +25,11 @@
   <script src="https://cdn.rawgit.com/mrdoob/three.js/r89/examples/js/loaders/FBXLoader.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/17.1.1/Tween.min.js"></script>
   <!-- <script src="js/WebVR.js"></script> -->
+
+  <script src="./js/RGBELoader.js"></script>
+  <script src="./js/PMREMGenerator.js"></script>
+  <script src="./js/PMREMCubeUVPacker.js"></script>
+  <script src="./js/HDRCubeTextureLoader.js"></script>
   <script>
     
     let camera, scene, renderer;
@@ -41,7 +46,7 @@
     let cardCarOn = false;
 
     let textureEquirec, textureCube, textureSphere;
-
+    let ldrCubeRenderTarget, hdrCubeRenderTarget, rgbmCubeRenderTarget;
 
     let mouse, raycaster;
     raycaster = new THREE.Raycaster();
@@ -93,12 +98,65 @@
 
       scene.add( cubeMesh );
 
+
+      var genCubeUrls = function( prefix, postfix ) {
+        return [
+          prefix + 'px' + postfix, prefix + 'nx' + postfix,
+          prefix + 'py' + postfix, prefix + 'ny' + postfix,
+          prefix + 'pz' + postfix, prefix + 'nz' + postfix
+        ];
+      };
+
+
+      
+      
+
+
+
       scene.background = new THREE.Color(0xbad4ff);
       camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 10000);
 
       renderer = new THREE.WebGLRenderer();
       renderer.setSize( window.innerWidth, window.innerHeight );
       document.body.appendChild( renderer.domElement );
+
+
+      var hdrUrls = genCubeUrls( './resource/textures/cube/pisaHDR/', '.hdr' );
+      new THREE.HDRCubeTextureLoader().load( THREE.UnsignedByteType, hdrUrls, function ( hdrCubeMap ) {
+
+        var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
+        pmremGenerator.update( renderer );
+
+        var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
+        pmremCubeUVPacker.update( renderer );
+
+        hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+
+        hdrCubeMap.dispose();
+        pmremGenerator.dispose();
+        pmremCubeUVPacker.dispose();
+
+      } );
+
+      renderer.toneMapping = THREE.LinearToneMapping;
+      renderer.gammaInput = true; 
+      renderer.gammaOutput = true;
+      renderer.toneMappingExposure = 1;
+/*
+      var toruGeometry = new THREE.TorusKnotBufferGeometry( 18, 8, 150, 20 );
+      var toruMaterial = new THREE.MeshStandardMaterial( {
+        color: 0xffffff,
+        metalness: 1,
+        roughness: 0.5,
+      } );
+      var torusMesh1 = new THREE.Mesh( toruGeometry, toruMaterial );
+      
+      scene.add( torusMesh1 );
+*/
+      // toruMaterial.envMap = hdrCubeRenderTarget.texture;
+
+
+      
       /*
       let geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
       let loader = new THREE.TextureLoader();
@@ -116,14 +174,16 @@
       scene.add( floorMesh );
       */
       // Lighting
-      /*
+      
       let spolotLight = new THREE.SpotLight( 0xFFFFFF, 0.95 ); // soft white light
       spolotLight.position.set(1,5,0);
       scene.add( spolotLight );
-      */
+      
+      
       let amibLight = new THREE.AmbientLight( 0xFFFFFF, 1 );
       amibLight.position.set( 3,3,3 );
       scene.add( amibLight );
+      
 
       // Controller
       camera.position.z=3;
@@ -141,7 +201,7 @@
       loader.load( './resource/models/fbx/car.fbx', function ( fbx ) {
         fbx.mixer = new THREE.AnimationMixer( fbx );
         let mesh = fbx.children[0];
-        mesh.material = new THREE.MeshPhongMaterial({vertexColors: THREE.VertexColors});
+        mesh.material = new THREE.MeshStandardMaterial({vertexColors: THREE.VertexColors});
 
         fbx.traverse( function ( child ) {
           if ( child.isMesh ) {
@@ -153,7 +213,6 @@
         console.log(fbx);
         carGroup.add( fbx );
       });
-
       carGroup.rotation.set(0,-Math.PI/2,0);
       carGroup.position.set(1,0,10);
       // Env
@@ -184,7 +243,7 @@
         let matLite = new THREE.MeshBasicMaterial( {
           color: color,
           transparent: true,
-          opacity: 0.4,
+          opacity: 0,
           side: THREE.DoubleSide
         });
         let message = "Little Factory\nLocation : Singapore\nPhone : 111 1234-5678 ";
@@ -198,14 +257,14 @@
         text.position.z = 0.05;
       });
       
-      let material = new THREE.MeshBasicMaterial({
+      let matFacCardBg = new THREE.MeshBasicMaterial({
         color: 0xeeeeee,
         transparent: true,
-        opacity: 0.4,
+        opacity: 0,
         side: THREE.DoubleSide,
         });
       let cardFacGeo = new THREE.PlaneBufferGeometry( 13, 6 );
-      let cardFacMesh = new THREE.Mesh( cardFacGeo, material );
+      let cardFacMesh = new THREE.Mesh( cardFacGeo, matFacCardBg );
       cardFacMesh.position.y = -1;
       infoCardFactoryGrp.add( cardFacMesh );
 
@@ -225,7 +284,7 @@
         let matLite = new THREE.MeshBasicMaterial( {
           color: color,
           transparent: true,
-          opacity: 0.4,
+          opacity: 0,
           side: THREE.DoubleSide
         });
         let message = "Little Car\nBrand : Tesla Semi\nType : Truck ";
@@ -239,8 +298,14 @@
         text.position.z = 0.05;
       });
 
+      let matCarCardBg = new THREE.MeshBasicMaterial({
+        color: 0xeeeeee,
+        transparent: true,
+        opacity: 0,
+        side: THREE.DoubleSide,
+      });
       let cardCarGeo = new THREE.PlaneBufferGeometry( 11, 6 );
-      let cardCarMesh = new THREE.Mesh( cardCarGeo, material );
+      let cardCarMesh = new THREE.Mesh( cardCarGeo, matCarCardBg );
       cardCarMesh.position.y = -1;
       
       scene.add( infoCardCarGrp );
@@ -268,6 +333,17 @@
           .to( { y: 13 }, 800 )
           .easing( TWEEN.Easing.Exponential.InOut )
           .start();
+        
+        infoCardFactoryGrp.traverse( function (child) {
+          if ( child.isMesh ) {
+            // child.material.opacity = 0;
+            let gone = new TWEEN.Tween( child.material )
+              .to( { opacity: 0.5 }, 800 )
+              .easing( TWEEN.Easing.Exponential.InOut )
+              .start();
+          }
+        });
+        
       } else{
         cardFacOn = false;
         let scaleUp = new TWEEN.Tween( infoCardFactoryGrp.scale )
@@ -278,6 +354,16 @@
           .to( { x: 0, y: -2, z: 0 }, 800 )
           .easing( TWEEN.Easing.Exponential.InOut )
           .start();
+        
+        infoCardFactoryGrp.traverse( function (child) {
+          if ( child.isMesh ) {
+            // child.material.opacity = 0;
+            let gone = new TWEEN.Tween( child.material )
+              .to( { opacity: 0 }, 800 )
+              .easing( TWEEN.Easing.Exponential.InOut )
+              .start();
+          }
+        });
       }
     }
     // Car show up animation
@@ -294,6 +380,16 @@
           .to( { y: 8 }, 800 )
           .easing( TWEEN.Easing.Exponential.InOut )
           .start();
+
+        infoCardCarGrp.traverse( function (child) {
+          if ( child.isMesh ) {
+            // child.material.opacity = 0;
+            let gone = new TWEEN.Tween( child.material )
+              .to( { opacity: 0.5 }, 800 )
+              .easing( TWEEN.Easing.Exponential.InOut )
+              .start();
+          }
+        });
       }else{
         cardCarOn = false;
         let scaleUp = new TWEEN.Tween( infoCardCarGrp.scale )
@@ -305,6 +401,16 @@
           .to( { x: 0, y: -2, z: 10 }, 800 )
           .easing( TWEEN.Easing.Exponential.InOut )
           .start();
+
+        infoCardCarGrp.traverse( function (child) {
+          if ( child.isMesh ) {
+            // child.material.opacity = 0;
+            let gone = new TWEEN.Tween( child.material )
+              .to( { opacity: 0 }, 800 )
+              .easing( TWEEN.Easing.Exponential.InOut )
+              .start();
+          }
+        });
       }
     }
 
