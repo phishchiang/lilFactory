@@ -26,31 +26,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/17.1.1/Tween.min.js"></script>
   <script src="js/dat.gui.min.js"></script>
   <!-- <script src="js/WebVR.js"></script> -->
-  <script type="x-shader/x-vertex" id="vertexShader">
-    varying vec3 vWorldPosition;
 
-    void main() {
-
-      vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
-      vWorldPosition = worldPosition.xyz;
-
-      gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-    }
-  </script>
-  <script type="x-shader/x-fragment" id="fragmentShader">
-    uniform vec3 topColor;
-    uniform vec3 bottomColor;
-    uniform float offset;
-    uniform float exponent;
-
-    varying vec3 vWorldPosition;
-
-    void main() {
-
-      float h = normalize( vWorldPosition + offset ).y;
-      gl_FragColor = vec4( mix( bottomColor, topColor, max( pow( max( h , 0.0), exponent ), 0.0 ) ), 1.0 );
-    }
-  </script>
 
   <script>
     
@@ -98,7 +74,7 @@
     function init(){
       scene = new THREE.Scene();
 
-      scene.background = new THREE.Color(0xbad4ff);
+      scene.background = new THREE.Color(0x353535);
       camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 10000);
 
       renderer = new THREE.WebGLRenderer();
@@ -148,24 +124,7 @@
 
       // hemiLightHelper = new THREE.HemisphereLightHelper( hemiLight, 10 );
       // scene.add( hemiLightHelper );
-      // SKYDOME
 
-      let vertexShader = document.getElementById( 'vertexShader' ).textContent;
-      let fragmentShader = document.getElementById( 'fragmentShader' ).textContent;
-      uniformsCC = {
-        topColor:    { value: new THREE.Color( 0x0077ff ) },
-        bottomColor: { value: new THREE.Color( 0xffffff ) },
-        offset:      { value: 33 },
-        exponent:    { value: 0.6 }
-      };
-      // uniformsCC.topColor.value.copy( hemiLight.color );
-
-
-      let skyGeo = new THREE.SphereBufferGeometry( 4000, 32, 15 );
-      let skyMat = new THREE.ShaderMaterial( { vertexShader: vertexShader, fragmentShader: fragmentShader, uniforms: uniformsCC, side: THREE.BackSide } );
-
-      sky = new THREE.Mesh( skyGeo, skyMat );
-      scene.add( sky );
       
       // DirLight
       dirLight = new THREE.DirectionalLight( 0xffffff,  params.directLt );
@@ -263,8 +222,8 @@
       infoCardFactoryGrp.add( cardFacMesh );
 
       scene.add( infoCardFactoryGrp );
-      infoCardFactoryGrp.scale.set(0.5, 0.01, 0.5);
-      infoCardFactoryGrp.position.set(0, -2, 0);
+      infoCardFactoryGrp.scale.set(0.5, 0.5, 0.5);
+      infoCardFactoryGrp.position.set(0, 10, 0);
 
 
       
@@ -305,8 +264,8 @@
       scene.add( infoCardCarGrp );
       infoCardCarGrp.add( cardCarMesh );
       infoCardCarGrp.rotation.y = Math.PI / 2;
-      infoCardCarGrp.scale.set(0.35, 0.001, 0.35);
-      infoCardCarGrp.position.set(0, -2, 10);
+      infoCardCarGrp.scale.set(0.35, 0.35, 0.35);
+      infoCardCarGrp.position.set(0, 4, 10);
 
       // GUI
       var gui = new dat.GUI();
@@ -326,16 +285,7 @@
       // console.log(e);
       if(!cardFacOn){
         cardFacOn = true;
-        let scaleUp = new TWEEN.Tween( infoCardFactoryGrp.scale )
-          .to( { x: 0.5, y: 0.5, z: 0.5 }, 800 )
-          .easing( TWEEN.Easing.Exponential.InOut )
-          .start();
 
-        let swing = new TWEEN.Tween( infoCardFactoryGrp.position )
-          .to( { y: 13 }, 800 )
-          .easing( TWEEN.Easing.Exponential.InOut )
-          .start();
-        
         infoCardFactoryGrp.traverse( function (child) {
           if ( child.isMesh ) {
             // child.material.opacity = 0;
@@ -348,15 +298,7 @@
         
       } else{
         cardFacOn = false;
-        let scaleUp = new TWEEN.Tween( infoCardFactoryGrp.scale )
-          .to( { x: 0.5, y: 0.01, z: 0.5 }, 800 )
-          .easing( TWEEN.Easing.Exponential.InOut )
-          .start();
-        let swing = new TWEEN.Tween( infoCardFactoryGrp.position )
-          .to( { x: 0, y: -2, z: 0 }, 800 )
-          .easing( TWEEN.Easing.Exponential.InOut )
-          .start();
-        
+
         infoCardFactoryGrp.traverse( function (child) {
           if ( child.isMesh ) {
             // child.material.opacity = 0;
@@ -373,15 +315,6 @@
       // console.log(e);
       if(!cardCarOn){
         cardCarOn = true;
-        let scaleUp = new TWEEN.Tween( infoCardCarGrp.scale )
-          .to( { x: 0.35, y: 0.35, z: 0.35 }, 800 )
-          .easing( TWEEN.Easing.Exponential.InOut )
-          .start();
-
-        let swing = new TWEEN.Tween( infoCardCarGrp.position )
-          .to( { y: 8 }, 800 )
-          .easing( TWEEN.Easing.Exponential.InOut )
-          .start();
 
         infoCardCarGrp.traverse( function (child) {
           if ( child.isMesh ) {
@@ -394,15 +327,6 @@
         });
       }else{
         cardCarOn = false;
-        let scaleUp = new TWEEN.Tween( infoCardCarGrp.scale )
-          .to( { x: 0.35, y: 0.01, z: 0.35 }, 800 )
-          .easing( TWEEN.Easing.Exponential.InOut )
-          .start();
-
-        let swing = new TWEEN.Tween( infoCardCarGrp.position )
-          .to( { x: 0, y: -2, z: 10 }, 800 )
-          .easing( TWEEN.Easing.Exponential.InOut )
-          .start();
 
         infoCardCarGrp.traverse( function (child) {
           if ( child.isMesh ) {
@@ -487,7 +411,6 @@
       hemiLight.intensity = params.hemiLt_intensity;
       hemiLight.color.setRGB(params.hemiLt_color.r/255, params.hemiLt_color.g/255, params.hemiLt_color.b/255);
       // hemiLight.color.set(params.hemiLt_color);
-      uniformsCC.topColor.value.copy( hemiLight.color );
       renderer.render( scene, camera );
     }
 
