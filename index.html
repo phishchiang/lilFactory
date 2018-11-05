@@ -285,7 +285,7 @@
       let fontLloader = new THREE.FontLoader();
       fontLloader.load( './resource/fonts/Varela_Round_Regular.json', function ( font ) {
         let xMid, text;
-        let color = 0x006699;
+        let color = 0x000000;
 
         let matLite = new THREE.MeshBasicMaterial( {
           color: color,
@@ -326,7 +326,7 @@
       // Car card info
       fontLloader.load( './resource/fonts/Varela_Round_Regular.json', function ( font ) {
         let xMid, text;
-        let color = 0x006699;
+        let color = 0x000000;
 
         let matLite = new THREE.MeshBasicMaterial( {
           color: color,
@@ -379,6 +379,13 @@
             let gone = new TWEEN.Tween( child.material )
               .to( { opacity: 0.5 }, 800 )
               .easing( TWEEN.Easing.Exponential.InOut )
+              .onComplete(function(){
+                let reset = new TWEEN.Tween( child.material )
+                  .to( { opacity: 0 }, 800 )
+                  .delay( 5000 )
+                  .easing( TWEEN.Easing.Exponential.InOut )
+                  .start();
+              })
               .start();
           }
         });
@@ -409,6 +416,13 @@
             let gone = new TWEEN.Tween( child.material )
               .to( { opacity: 0.5 }, 800 )
               .easing( TWEEN.Easing.Exponential.InOut )
+              .onComplete(function(){
+                let reset = new TWEEN.Tween( child.material )
+                  .to( { opacity: 0 }, 800 )
+                  .delay( 5000 )
+                  .easing( TWEEN.Easing.Exponential.InOut )
+                  .start();
+              })
               .start();
           }
         });
