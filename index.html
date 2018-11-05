@@ -360,7 +360,7 @@
       infoCardCarGrp.rotation.y = Math.PI / 2;
       infoCardCarGrp.scale.set(0.35, 0.35, 0.35);
       infoCardCarGrp.position.set(0, 4, 10);
-
+      
 
       //add event listener for mouse and calls function when activated
       document.addEventListener( 'mousedown', onDocumentMouseDown, false );
@@ -519,6 +519,8 @@
       } else{
         innerGroup.children[0].children[0].material.emissive.setRGB(0, 0, 0);
       }
+      infoCardFactoryGrp.lookAt( camera.position );
+      infoCardCarGrp.lookAt( camera.position );
       renderer.render( scene, camera );
     }
 
