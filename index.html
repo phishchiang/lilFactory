@@ -73,12 +73,16 @@
     function init(){
       scene = new THREE.Scene();
 
-      scene.background = new THREE.Color(0x353535);
+      scene.background = new THREE.Color(0x454545);
       camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 10000);
 
       renderer = new THREE.WebGLRenderer();
       renderer.setSize( window.innerWidth, window.innerHeight );
       document.body.appendChild( renderer.domElement );
+
+      renderer.gammaInput = true;
+      renderer.gammaOutput = true;
+
 
 
 
