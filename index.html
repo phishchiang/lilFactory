@@ -47,6 +47,7 @@
     let infoCardCarGrp = new THREE.Group();
     let cardFacOn = false;
     let cardCarOn = false;
+    let facIsTransparent = false;
     let dirLight;
     let sky
 
@@ -130,10 +131,11 @@
       
 
       // Controller
-      camera.position.z=3;
+      // camera.position.z=3;
       let controls = new THREE.OrbitControls(camera, renderer.domElement)
-      camera.position.z = 15
-      camera.position.y = 1
+      // camera.position.z = 15
+      // camera.position.y = 1
+      camera.position.set( 12.75, 8, 14 );
       controls.update()
       
       
@@ -441,6 +443,25 @@
           .start();
     }
 
+    function showInner(){
+      if(!facIsTransparent){
+        facIsTransparent = true;
+        facGroup.children[0].children[0].material.transparent = true;
+        facGroup.children[0].children[0].material.opacity=0.3;
+        gateGroup.children[0].children[0].material.transparent = true;
+        gateGroup.children[0].children[0].material.opacity=0.3;
+        gateBtnGroup.children[0].children[0].material.transparent = true;
+        gateBtnGroup.children[0].children[0].material.opacity=0.3;
+        
+      } else{
+        facIsTransparent = false;
+        facGroup.children[0].children[0].material.opacity=1;
+        gateGroup.children[0].children[0].material.opacity=1;
+        gateBtnGroup.children[0].children[0].material.opacity=1;
+      }
+
+    };
+
     function onDocumentMouseDown(e){
       event.preventDefault();
       mouse.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
@@ -454,13 +475,13 @@
         // intersects[ 0 ].object.material.color.setHex(Math.random() * 0xffffff);
         
         if(intersects[0].object.name==='floor_inner1'){
-          console.log('do fac');
           showFacinfoCard();
-
         }
         if(intersects[0].object.name==='factory_car_a01'){
-          console.log('do car');
           showCarinfoCard();
+        }
+        if(intersects[0].object.name==='roofFrame_a01'){
+          showInner();
         }
       }
       
@@ -488,6 +509,11 @@
       TWEEN.update();
       if(!isTweening){
         carGroup.position.y = Math.cos( time * 22 ) * 0.05;
+      }
+      if(facIsTransparent){
+        innerGroup.children[0].children[0].material.emissive.setRGB((Math.cos( time * 5 ) * 0.25)+0.2, (Math.cos( time * 5 ) * 0.25)+0.2, (Math.cos( time * 5 ) * 0.25)+0.2);
+      } else{
+        innerGroup.children[0].children[0].material.emissive.setRGB(0, 0, 0);
       }
       renderer.render( scene, camera );
     }
