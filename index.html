@@ -37,6 +37,11 @@
     let clock = new THREE.Clock();
     let time = 0;
     let carGroup = new THREE.Group();
+    let facGroup = new THREE.Group();
+    let treeGroup = new THREE.Group();
+    let gateGroup = new THREE.Group();
+    let gateBtnGroup = new THREE.Group();
+    let innerGroup = new THREE.Group();
     let envGroup = new THREE.Group();
     let infoCardFactoryGrp = new THREE.Group();
     let infoCardCarGrp = new THREE.Group();
@@ -44,13 +49,6 @@
     let cardCarOn = false;
     let dirLight;
     let sky
-    let hemiKolor = new THREE.Color( 0x9fc2f9 );
-    let uniformsCC;
-    let params = {
-      directLt: 1.0,
-      hemiLt_intensity: 0.6,
-      hemiLt_color: hemiKolor,
-    };
 
     let mouse, raycaster;
     raycaster = new THREE.Raycaster();
@@ -102,22 +100,15 @@
       scene.add( floorMesh );
       */
       /*
-      // Lighting
-      let spolotLight = new THREE.SpotLight( 0xFFFFFF, 0.95 ); // soft white light
-      spolotLight.position.set(1,5,0);
-      scene.add( spolotLight );
-      
       let amibLight = new THREE.AmbientLight( 0xFFFFFF, 0.2 );
       amibLight.position.set( 3,3,3 );
       scene.add( amibLight );
       */
       // LIGHTS
 
-      hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, params.hemiLt_intensity );
-      // hemiLight.color.setHSL( 0.6, 1, 0.6 );
+      hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.6 );
+      hemiLight.color.setHSL( 0.6, 1, 0.6 );
       // hemiKolor = new THREE.Color( 0x9fc2f9 );
-      hemiLight.color = params.hemiLt_color;
-      params.hemiLt_color = {r: 102, g: 157, b: 242};
       hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
       hemiLight.position.set( 0, 50, 0 );
       scene.add( hemiLight );
@@ -127,7 +118,7 @@
 
       
       // DirLight
-      dirLight = new THREE.DirectionalLight( 0xffffff,  params.directLt );
+      dirLight = new THREE.DirectionalLight( 0xffffff,  1.2 );
       dirLight.color.setHSL( 0.1, 1, 0.95 );
       dirLight.position.set( 1, 1.75, 1 );
       dirLight.position.multiplyScalar( 30 );
@@ -148,6 +139,7 @@
       
       //FBX import
       let loader = new THREE.FBXLoader();
+
       // Car
       
       scene.add( carGroup );
@@ -168,6 +160,7 @@
       });
       carGroup.rotation.set(0,-Math.PI/2,0);
       carGroup.position.set(1,0,10);
+
       // Env
       
       scene.add( envGroup );
@@ -185,6 +178,101 @@
         });
         console.log(fbx);
         envGroup.add( fbx );
+      });
+
+      // Fac
+      
+      scene.add( facGroup );
+      loader.load( './resource/models/fbx/factory.fbx', function ( fbx ) {
+        fbx.mixer = new THREE.AnimationMixer( fbx );
+        let mesh = fbx.children[0];
+        mesh.material = new THREE.MeshPhongMaterial({vertexColors: THREE.VertexColors});
+
+        fbx.traverse( function ( child ) {
+          if ( child.isMesh ) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+            intersectObjs.push(child);
+          }
+        });
+        console.log(fbx);
+        facGroup.add( fbx );
+      });
+
+      // Inner
+      
+      scene.add( innerGroup );
+      loader.load( './resource/models/fbx/inner.fbx', function ( fbx ) {
+        fbx.mixer = new THREE.AnimationMixer( fbx );
+        let mesh = fbx.children[0];
+        mesh.material = new THREE.MeshPhongMaterial({vertexColors: THREE.VertexColors});
+
+        fbx.traverse( function ( child ) {
+          if ( child.isMesh ) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+            intersectObjs.push(child);
+          }
+        });
+        console.log(fbx);
+        innerGroup.add( fbx );
+      });
+
+      // Gate
+      
+      scene.add( gateGroup );
+      loader.load( './resource/models/fbx/gate.fbx', function ( fbx ) {
+        fbx.mixer = new THREE.AnimationMixer( fbx );
+        let mesh = fbx.children[0];
+        mesh.material = new THREE.MeshPhongMaterial({vertexColors: THREE.VertexColors});
+
+        fbx.traverse( function ( child ) {
+          if ( child.isMesh ) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+            intersectObjs.push(child);
+          }
+        });
+        console.log(fbx);
+        gateGroup.add( fbx );
+      });
+
+      // Gate Btn
+      
+      scene.add( gateBtnGroup );
+      loader.load( './resource/models/fbx/gateBtn.fbx', function ( fbx ) {
+        fbx.mixer = new THREE.AnimationMixer( fbx );
+        let mesh = fbx.children[0];
+        mesh.material = new THREE.MeshPhongMaterial({vertexColors: THREE.VertexColors});
+
+        fbx.traverse( function ( child ) {
+          if ( child.isMesh ) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+            intersectObjs.push(child);
+          }
+        });
+        console.log(fbx);
+        gateBtnGroup.add( fbx );
+      });
+
+      // Tree
+      
+      scene.add( treeGroup );
+      loader.load( './resource/models/fbx/tree.fbx', function ( fbx ) {
+        fbx.mixer = new THREE.AnimationMixer( fbx );
+        let mesh = fbx.children[0];
+        mesh.material = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors});
+
+        fbx.traverse( function ( child ) {
+          if ( child.isMesh ) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+            intersectObjs.push(child);
+          }
+        });
+        console.log(fbx);
+        treeGroup.add( fbx );
       });
       
       // Factory card info
@@ -267,13 +355,6 @@
       infoCardCarGrp.scale.set(0.35, 0.35, 0.35);
       infoCardCarGrp.position.set(0, 4, 10);
 
-      // GUI
-      var gui = new dat.GUI();
-
-      gui.add( params, 'directLt', 0, 2 );
-      gui.add( params, 'hemiLt_intensity', 0, 1 );
-      gui.addColor( params, 'hemiLt_color' )
-      gui.open();
 
       //add event listener for mouse and calls function when activated
       document.addEventListener( 'mousedown', onDocumentMouseDown, false );
@@ -366,12 +447,13 @@
       mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
       raycaster.setFromCamera( mouse, camera );
       let intersects = raycaster.intersectObjects( intersectObjs );
+      console.log(intersects[0]);
       // console.log(intersects);
       if ( intersects.length > 0 ){
         // console.log(intersects[0].object.name);
         // intersects[ 0 ].object.material.color.setHex(Math.random() * 0xffffff);
         
-        if(intersects[0].object.name==='factory_evn_a01'){
+        if(intersects[0].object.name==='floor_inner1'){
           console.log('do fac');
           showFacinfoCard();
 
@@ -407,10 +489,6 @@
       if(!isTweening){
         carGroup.position.y = Math.cos( time * 22 ) * 0.05;
       }
-      dirLight.intensity = params.directLt;
-      hemiLight.intensity = params.hemiLt_intensity;
-      hemiLight.color.setRGB(params.hemiLt_color.r/255, params.hemiLt_color.g/255, params.hemiLt_color.b/255);
-      // hemiLight.color.set(params.hemiLt_color);
       renderer.render( scene, camera );
     }
 
