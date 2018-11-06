@@ -50,6 +50,7 @@
     let facIsTransparent = false;
     let dirLight;
     let sky
+    let carWorldPosition;
 
 
     let mouse, raycaster;
@@ -361,8 +362,10 @@
       infoCardCarGrp.rotation.y = Math.PI / 2;
       infoCardCarGrp.scale.set(0.35, 0.35, 0.35);
       // carGroup.add(infoCardCarGrp);
-      infoCardCarGrp.position.set(0, 4, 10);
-
+      infoCardCarGrp.position.set(0, 4, 0);
+      
+      scene.updateMatrixWorld(true);
+      
       
       
       //add event listener for mouse and calls function when activated
@@ -409,10 +412,9 @@
     }
     // Car show up animation
     function showCarinfoCard (e){
-      // console.log(e);
+      carAudio.play();
       if(!cardCarOn){
         cardCarOn = true;
-
         infoCardCarGrp.traverse( function (child) {
           if ( child.isMesh ) {
             // child.material.opacity = 0;
@@ -520,7 +522,7 @@
       mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
       raycaster.setFromCamera( mouse, camera );
       let intersects = raycaster.intersectObjects( intersectObjs );
-      console.log(intersects[0]);
+      // console.log(intersects[0]);
       // console.log(intersects);
       if ( intersects.length > 0 ){
         // console.log(intersects[0].object.name);
@@ -572,6 +574,10 @@
       }
       infoCardFactoryGrp.lookAt( camera.position );
       infoCardCarGrp.lookAt( camera.position );
+      carWorldPosition = new THREE.Vector3();
+      carWorldPosition.setFromMatrixPosition( carGroup.matrixWorld );
+      infoCardCarGrp.position.set(carWorldPosition.x, carWorldPosition.y+4, carWorldPosition.z);
+      // console.log(carWorldPosition);
       renderer.render( scene, camera );
     }
 
