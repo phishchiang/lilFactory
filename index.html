@@ -31,7 +31,7 @@
   <script>
     
     let camera, scene, renderer;
-    let isTweening = false;
+    let isCarMoving = false;
     let snowPartiArray;
     let mixers = [];
     let clock = new THREE.Clock();
@@ -50,6 +50,7 @@
     let facIsTransparent = false;
     let dirLight;
     let sky
+
 
     let mouse, raycaster;
     raycaster = new THREE.Raycaster();
@@ -164,8 +165,8 @@
         console.log(fbx);
         carGroup.add( fbx );
       });
-      carGroup.rotation.set(0,-Math.PI/2,0);
-      carGroup.position.set(1,0,10);
+      carGroup.rotation.set(0, -90*Math.PI/180, 0);
+      carGroup.position.set(5,0,10);
 
       // Env
       
@@ -359,9 +360,11 @@
       infoCardCarGrp.add( cardCarMesh );
       infoCardCarGrp.rotation.y = Math.PI / 2;
       infoCardCarGrp.scale.set(0.35, 0.35, 0.35);
+      // carGroup.add(infoCardCarGrp);
       infoCardCarGrp.position.set(0, 4, 10);
-      
 
+      
+      
       //add event listener for mouse and calls function when activated
       document.addEventListener( 'mousedown', onDocumentMouseDown, false );
       // renderer.domElement.addEventListener('mousedown', mousedown);
@@ -441,25 +444,56 @@
       }
     }
 
-    function carMoves(){
-      console.log(isTweening);
-      let swing = new TWEEN.Tween( carGroup.position )
-        .to( { y: 2 }, 300 )
-        // .easing( TWEEN.Easing.Back.In )
+    function carCircle(){
+      // console.log(isCarMoving);
+      isCarMoving = true;
+      let swing_01 = new TWEEN.Tween( carGroup.position )
+        .to( { x: -10 }, 3000 )
         .onComplete(function(){
-          carGroup.position.y = 2;
-          let reset = new TWEEN.Tween( carGroup.position )
-            .to( { y: 0 }, 300 )
-            .delay( 100 )
-            // .easing( TWEEN.Easing.Exponential.InOut )
+
+          let swing_02turn = new TWEEN.Tween( carGroup.rotation )
+            .to( { y: -180*Math.PI/180  }, 100 )
+            .start();
+
+          let swing_02go = new TWEEN.Tween( carGroup.position )
+            .to( { z: -5 }, 3000 )
             .onComplete(function(){
-              isTweening = false;
-              renderer.domElement.style.cursor = 'pointer';
+              
+              let swing_03turn = new TWEEN.Tween( carGroup.rotation )
+              .to( { y: -270*Math.PI/180  }, 100 )
+              .start();
+
+              let swing_03go = new TWEEN.Tween( carGroup.position )
+              .to( { x: 5 }, 3000 )
+              .onComplete(function(){
+
+                let swing_04turn = new TWEEN.Tween( carGroup.rotation )
+                .to( { y: -360*Math.PI/180 }, 100 )
+                .start();
+
+                let swing_04go = new TWEEN.Tween( carGroup.position )
+                .to( { z: 10 }, 3000 )
+                .onComplete(function(){
+                  let swing_05turn = new TWEEN.Tween( carGroup.rotation )
+                  .to( { y: -450*Math.PI/180 }, 100 )
+                  .onComplete(function(){
+                    isCarMoving = false;
+                  })
+
+                  .start();
+                })
+                .start();
+
+              })
+              .start();
+
             })
             .start();
+
           })
           .start();
     }
+
 
     function showInner(){
       if(!facIsTransparent){
@@ -506,9 +540,9 @@
     }
 
     function mousedown(e){
-        if ( !isTweening ) {
+        if ( !isCarMoving ) {
           carAudio.play();
-          isTweening = true;
+          isCarMoving = true;
           renderer.domElement.style.cursor = 'default';
           carMoves();
         }
@@ -525,8 +559,11 @@
       requestAnimationFrame(animate);
       time += clock.getDelta();
       TWEEN.update();
-      if(!isTweening){
-        carGroup.position.y = Math.cos( time * 22 ) * 0.05;
+      carGroup.position.y = Math.cos( time * 22 ) * 0.05;
+      if(!isCarMoving){
+        carCircle();
+      }else{
+
       }
       if(facIsTransparent){
         innerGroup.children[0].children[0].material.emissive.setRGB((Math.cos( time * 5 ) * 0.25)+0.2, (Math.cos( time * 5 ) * 0.25)+0.2, (Math.cos( time * 5 ) * 0.25)+0.2);
